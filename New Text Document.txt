@@ -1,0 +1,56 @@
+
+
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/hfazlul/blog.git
+git push -u origin main
+
+
+
+Fazlul@DESKTOP-G3C49T0 MINGW64 /e/XAMPP/htdocs/blog-project7
+$ git init
+
+
+Fazlul@DESKTOP-G3C49T0 MINGW64 /e/XAMPP/htdocs/blog-project7 (master)
+$ git add README.md
+
+Fazlul@DESKTOP-G3C49T0 MINGW64 /e/XAMPP/htdocs/blog-project7 (master)
+$ git status
+
+
+Fazlul@DESKTOP-G3C49T0 MINGW64 /e/XAMPP/htdocs/blog-project7 (master)
+$ git add .
+
+
+Fazlul@DESKTOP-G3C49T0 MINGW64 /e/XAMPP/htdocs/blog-project7 (master)
+$ git status
+
+
+Fazlul@DESKTOP-G3C49T0 MINGW64 /e/XAMPP/htdocs/blog-project7 (master)
+$ git branch -M main
+
+Fazlul@DESKTOP-G3C49T0 MINGW64 /e/XAMPP/htdocs/blog-project7 (main)
+$ git remote add origin https://github.com/hfazlul/blog.git
+
+Fazlul@DESKTOP-G3C49T0 MINGW64 /e/XAMPP/htdocs/blog-project7 (main)
+$ git push -u origin main
+
+
+Fazlul@DESKTOP-G3C49T0 MINGW64 /e/XAMPP/htdocs/blog-project7 (main)
+$ git status
+
+
+
+
+Fazlul@DESKTOP-G3C49T0 MINGW64 /e/XAMPP/htdocs/blog-project7 (main)
+$ git add .
+
+
+Fazlul@DESKTOP-G3C49T0 MINGW64 /e/XAMPP/htdocs/blog-project7 (main)
+$ git commit -m "create one file"
+
+
+
+
