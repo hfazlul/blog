@@ -4825,22 +4825,12 @@ __webpack_require__.r(__webpack_exports__);
     remove: function remove(slug) {
       var _this = this;
 
-      Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
-      }).then(function (result) {
-        if (result.isConfirmed) {
-          axios.get("remove-category/" + slug).then(function (response) {
-            _this.$store.dispatch("getCategories");
+      this.confirm(function () {
+        axios.get("remove-category/" + slug).then(function (response) {
+          _this.$store.dispatch("getCategories");
 
-            Swal.fire('Deleted!', 'Your file has been deleted.', 'success');
-          })["catch"](function (error) {});
-        }
+          Swal.fire('Deleted!', 'Your file has been deleted.', 'success');
+        })["catch"](function (error) {});
       });
     },
     published: function published(id) {
@@ -4864,27 +4854,6 @@ __webpack_require__.r(__webpack_exports__);
         }
       });
     },
-    // published: function (id) {
-    //         Swal.fire({
-    //     title: 'Are you sure?',
-    //     text: "You won't be able to revert this!",
-    //     icon: 'warning',
-    //     showCancelButton: true,
-    //     confirmButtonColor: '#3085d6',
-    //     cancelButtonColor: '#d33',
-    //     confirmButtonText: 'Yes, published,unPublishe it!'
-    //     }).then((result) => {
-    //     if (result.isConfirmed) {
-    //           axios.get("unPublished-category/"+id).then((response)=>{
-    //           this.$store.dispatch("getCategories");
-    //       Swal.fire(
-    //         'success'
-    //         )
-    //         }).catch((error)=>{
-    //         })
-    //       }
-    //     })
-    // },
     emptyData: function emptyData() {
       return this.categories.length < 1;
     },
@@ -4904,16 +4873,18 @@ __webpack_require__.r(__webpack_exports__);
     removeItems: function removeItems(selectId) {
       var _this4 = this;
 
-      axios.post("/categories/remove-items", {
-        ids: selectId
-      }).then(function (response) {
-        _this4.selectId = [];
-        _this4.selectIds = false;
-        _this4.isSelected = false;
-        toastr.success(response.data.total + 'Category Delete success');
+      this.confirm(function () {
+        axios.post("/categories/remove-items", {
+          ids: selectId
+        }).then(function (response) {
+          _this4.selectId = [];
+          _this4.selectIds = false;
+          _this4.isSelected = false;
+          toastr.success(response.data.total + 'Category Delete success');
 
-        _this4.$store.dispatch("getCategories");
-      })["catch"](function (error) {});
+          _this4.$store.dispatch("getCategories");
+        })["catch"](function (error) {});
+      });
     },
     changeStatus: function changeStatus(selectId, status) {
       var _this5 = this;
@@ -87050,6 +87021,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var toastr__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! toastr */ "./node_modules/toastr/toastr.js");
 /* harmony import */ var toastr__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(toastr__WEBPACK_IMPORTED_MODULE_6__);
 /* harmony import */ var _filter_filter__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./filter/filter */ "./resources/js/filter/filter.js");
+/* harmony import */ var _helphers_mixin__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./helphers/mixin */ "./resources/js/helphers/mixin.js");
 __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
 
 window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js"); // vuex----start
@@ -87096,6 +87068,9 @@ window.toastr = toastr__WEBPACK_IMPORTED_MODULE_6___default.a; // Toastrjs----En
 // Momentjs----Start
 
  // Momentjs----End
+// Mixin js----Start
+
+ // Mixin js----End
 // vue-Component----start
 
 Vue.component('example', __webpack_require__(/*! ./components/routeControl.vue */ "./resources/js/components/routeControl.vue")["default"]); // vue-Component----end
@@ -87730,6 +87705,38 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.filter('time', function (a) {
 });
 vue__WEBPACK_IMPORTED_MODULE_0___default.a.filter('subString', function (content, length) {
   return content.substring(0, length);
+});
+
+/***/ }),
+
+/***/ "./resources/js/helphers/mixin.js":
+/*!****************************************!*\
+  !*** ./resources/js/helphers/mixin.js ***!
+  \****************************************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vue__WEBPACK_IMPORTED_MODULE_0__);
+
+vue__WEBPACK_IMPORTED_MODULE_0___default.a.mixin({
+  methods: {
+    confirm: function confirm(callback) {
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      }).then(function (result) {
+        if (result.isConfirmed) callback();
+      });
+    }
+  }
 });
 
 /***/ }),

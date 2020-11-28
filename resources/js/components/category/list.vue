@@ -146,29 +146,20 @@ export default {
         //     return data [status];
         // },
         remove: function (slug) {
-         Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-            if (result.isConfirmed) {
-                  axios.get("remove-category/"+slug).then((response)=>{
-                  this.$store.dispatch("getCategories");
-              Swal.fire(
-                'Deleted!',
-                'Your file has been deleted.',
-                'success'
-                )
+            this.confirm( ()=>{
+                   axios.get("remove-category/"+slug).then((response)=>{
+                        this.$store.dispatch("getCategories");
+                    Swal.fire(
+                        'Deleted!',
+                        'Your file has been deleted.',
+                        'success'
+                        )
 
-                }).catch((error)=>{
+                        }).catch((error)=>{
 
-                })
-              }
-            })
+                        })
+            });
+
         },
         published: function (id) {
                 Swal.fire({
@@ -194,31 +185,6 @@ export default {
             })
 
         },
-        // published: function (id) {
-        //         Swal.fire({
-        //     title: 'Are you sure?',
-        //     text: "You won't be able to revert this!",
-        //     icon: 'warning',
-        //     showCancelButton: true,
-        //     confirmButtonColor: '#3085d6',
-        //     cancelButtonColor: '#d33',
-        //     confirmButtonText: 'Yes, published,unPublishe it!'
-        //     }).then((result) => {
-        //     if (result.isConfirmed) {
-        //           axios.get("unPublished-category/"+id).then((response)=>{
-        //           this.$store.dispatch("getCategories");
-        //       Swal.fire(
-        //         'success'
-        //         )
-
-        //         }).catch((error)=>{
-
-        //         })
-        //       }
-        //     })
-
-        // },
-
 
         emptyData(){
             return (this.categories.length <1);
@@ -236,6 +202,7 @@ export default {
             }
         },
         removeItems: function(selectId){
+            this.confirm( ()=>{
            axios.post("/categories/remove-items",{ids:selectId}).then((response)=>{
                 this.selectId= [];
                 this.selectIds= false;
@@ -245,6 +212,7 @@ export default {
            }).catch((error)=>{
 
            })
+            });
         },
         changeStatus: function(selectId,status){
             let msg=status === 1 ? "Published":"Unpublished";

@@ -56,6 +56,12 @@ window.Toast=Toast;
 import {moment} from "./filter/filter";
   // Momentjs----End
 
+  // Mixin js----Start
+
+import  "./helphers/mixin";
+
+  // Mixin js----End
+
 // vue-Component----start
 Vue.component('example', require('./components/routeControl.vue').default);
 // vue-Component----end
