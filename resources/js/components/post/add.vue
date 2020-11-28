@@ -8,11 +8,11 @@
 
                     <div class="card-header">
                             <div class="card-header">
-                                <h3 class="card-title">Category Edit</h3>
+                                <h3 class="card-title">Post Add</h3>
                                     <div class="card-tools">
                                         <button class="btn btn-success">
-                                            <router-link to="/categoryList"  style="color:white; text-decoration:none;">
-                                                    CategoryList
+                                            <router-link to="/postList"  style="color:white; text-decoration:none;">
+                                                    PostList
                                             </router-link>
                                             </button>
 
@@ -23,7 +23,7 @@
 
               <!-- form start -->
 
-                        <form role="form" @submit.prevent="updateCategory">
+                        <form role="form" @submit.prevent="addPost">
                             <div class="card-body">
                                     <div class="form-group">
                                         <label >Category Name</label>
@@ -47,7 +47,7 @@
                             <!-- /.card-body -->
 
                                 <div class="card-footer">
-                                   <button type="submit" :disable="form.busy" class="btn btn-primary">Update Catergory</button>
+                                   <button type="submit" :disable="form.busy" class="btn btn-primary">Submit</button>
                                 </div>
                         </form>
               </div>
@@ -59,11 +59,10 @@
 
 <script>
     export default {
-         name: "CategoryEdit",
+         name: "PostAdd",
          data: function (){
              return {
                  form: new Form({
-                    id:'',
                     name:'',
                     status: ''
                  })
@@ -71,30 +70,21 @@
              }
 
          },
-         mounted()
-         {
-            this.getCategory();
-         },
          methods: {
+             addPost: function () {
+                 let test =this;
+                 this.form.post('/addPost')
+                 .then(function (data) {
+                    // Toast.fire({
+                    // icon: 'success',
+                    // title: 'Category add successfully'
+                    // })
+                    toastr.success('Post add successfully',{timeOut:5000});
+                     test.form.name=null;
+                     test.form.status=null;
+                 })
 
-                updateCategory: function () {
-                    let this_ =this;
-                    this_.form.post('/updateCategory')
-                    .then( (response) => {
-                        toastr.success('Category update successfully');
-                        this_.$router.push("/categoryList");
-                    })
-
-                },
-                getCategory: function () {
-                const this_=this;
-                axios.get("/show-category/"+this.$route.params.slug).then((response)=>{
-                    this_.form.fill(response.data.category);
-                }).catch((error)=>{
-
-                })
              }
-
          },
 
     }

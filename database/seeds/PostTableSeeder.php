@@ -15,10 +15,12 @@ class PostTableSeeder extends Seeder
         $faker = Faker\Factory::create();
 
         foreach (range(1, 100) as $index) {
+            $title=$faker->sentence;
             Post::create([
                 "user_id"     => rand(1, 20),
                 "category_id" => rand(1, 5),
-                "title"       => $faker->sentence,
+                "title"       => $title,
+                "slug"        => slugify($title),
                 "content"     => $faker->paragraph,
                 "thumbnail"   => $faker->imageUrl(),
                 "status"      => $this->getRandomStatus(),

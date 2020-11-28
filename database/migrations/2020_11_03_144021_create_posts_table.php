@@ -18,6 +18,7 @@ class CreatePostsTable extends Migration
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('category_id');
             $table->string('title', 180);
+            $table->string('slug', 180);
             $table->longText('content');
             $table->string('thumbnail', 255);
             $table->enum('status', ['draft', 'published'])->default('draft');

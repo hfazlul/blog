@@ -15,8 +15,8 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts=Post::with('category','user')->get();
-        return $posts;
+        $posts=Post::with('category', 'user')->get();
+        return response()->json(['posts' => $posts], 200);
     }
 
     /**
@@ -37,7 +37,12 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+                            'name' => 'required|min:5|max:20',
+                            'status' => 'required',
+                         ]);
+
+        Post::savePostInfo($request);
     }
 
     /**
@@ -46,9 +51,10 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($slug)
     {
-        //
+        $post=Post::where('slug',$slug)->first();
+       return response()->json(['post'=>$post], 200);
     }
 
     /**
@@ -57,10 +63,42 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function published($id)
     {
-        //
+        $post=Post::find($id);
+
+        if( $post->status=1){
+            $post->status=0;
+            $post->save();
+            $success=true;
+        }
+         elseif($post->status=0){
+            $post->status=1;
+            $post->save();
+            $success=true;
+        }
+        else{
+            $success=false;
+        }
+        return response()->json(['success'=>$success], 200);
     }
+    // public function unPublished($id)
+    // {
+    //     $category=Category::find($id);
+
+    //     if( $category->status=0){
+    //         $category->status=1;
+    //         $category->save();
+    //         $success=true;
+    //     }
+
+
+
+    //     else{
+    //         $success=false;
+    //     }
+    //     return response()->json(['success'=>$success], 200);
+    // }
 
     /**
      * Update the specified resource in storage.
@@ -69,9 +107,15 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|min:5|max:20',
+            'status' => 'required',
+        ]);
+
+        Post::updatePostInfo($request);
+
     }
 
     /**
@@ -80,8 +124,16 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($slug)
     {
-        //
+       $post=Post::where('slug',$slug)->first();
+       if( $post->delete()){
+           $success=true;
+       }
+       else{
+           $success=false;
+       }
+
+       return response()->json(['success'=>$success], 200);
     }
 }

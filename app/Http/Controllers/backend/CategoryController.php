@@ -68,10 +68,42 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function published($id)
     {
-        //
+        $category=Category::find($id);
+
+        if( $category->status=1){
+            $category->status=0;
+            $category->save();
+            $success=true;
+        }
+         elseif($category->status=0){
+            $category->status=1;
+            $category->save();
+            $success=true;
+        }
+        else{
+            $success=false;
+        }
+        return response()->json(['success'=>$success], 200);
     }
+    // public function unPublished($id)
+    // {
+    //     $category=Category::find($id);
+
+    //     if( $category->status=0){
+    //         $category->status=1;
+    //         $category->save();
+    //         $success=true;
+    //     }
+
+
+
+    //     else{
+    //         $success=false;
+    //     }
+    //     return response()->json(['success'=>$success], 200);
+    // }
 
     /**
      * Update the specified resource in storage.
@@ -80,9 +112,15 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|min:5|max:20',
+            'status' => 'required',
+        ]);
+
+        Category::updateCategoryInfo($request);
+
     }
 
     /**
@@ -103,4 +141,30 @@ class CategoryController extends Controller
 
        return response()->json(['success'=>$success], 200);
     }
+      public function removeItems(Request $request){
+          $sl=0;
+        foreach($request->ids as $id){
+            $category=Category::find($id);
+            $category->delete();
+            $sl++;
+
+        }
+        $success= $sl > 0 ? true : false;
+        return response()->json(['success'=> $success, 'total'=>$sl], 200);
+      }
+
+      public function changeStatus(Request $request){
+
+        $sl=0;
+        foreach($request->ids as $id){
+            $category=Category::find($id);
+            $category->status =$request->status;
+            $category->save();
+            $sl++;
+
+        }
+        $success= $sl > 0 ? true : false;
+        return response()->json(['success'=> $success, 'total'=>$sl], 200);
+
+      }
 }

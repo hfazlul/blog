@@ -50,26 +50,18 @@
                   {{-- <i class="right fa fa-angle-left"></i> --}}
                 </p>
               </router-link>
-              {{-- <ul class="nav nav-treeview">
-                <li class="nav-item">
-                  <a href="../../index.html" class="nav-link">
-                    <i class="fa fa-circle-o nav-icon"></i>
-                    <p>Dashboard v1</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="../../index2.html" class="nav-link">
-                    <i class="fa fa-circle-o nav-icon"></i>
-                    <p>Dashboard v2</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="../../index3.html" class="nav-link">
-                    <i class="fa fa-circle-o nav-icon"></i>
-                    <p>Dashboard v3</p>
-                  </a>
-                </li>
-              </ul> --}}
+
+            </li>
+
+          <li class="nav-item has-treeview">
+              <router-link  to="/postList" class="nav-link">
+                <i class="nav-icon fa fa-dashboard"></i>
+                <p>
+                  Post
+                  {{-- <i class="right fa fa-angle-left"></i> --}}
+                </p>
+              </router-link>
+
             </li>
       </ul>
     </nav>

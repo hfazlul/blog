@@ -33,4 +33,21 @@ class Category extends Model
 
             }
 
+    public static function updateCategoryInfo($request){
+
+               $category          = new Category();
+               $category->name    =$request->name;
+               $category->slug    =slugify($request->name);
+               $category->status  =$request->status;
+               if ($category->save()){
+
+                   $success=true;
+               } else {
+
+                   $success= false;
+               }
+               return response()->json(['success'=>$success], 200);
+
+            }
+
 }

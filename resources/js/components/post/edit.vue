@@ -11,8 +11,8 @@
                                 <h3 class="card-title">Category Edit</h3>
                                     <div class="card-tools">
                                         <button class="btn btn-success">
-                                            <router-link to="/categoryList"  style="color:white; text-decoration:none;">
-                                                    CategoryList
+                                            <router-link to="/postList"  style="color:white; text-decoration:none;">
+                                                    PostList
                                             </router-link>
                                             </button>
 
