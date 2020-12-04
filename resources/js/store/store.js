@@ -23,6 +23,13 @@ export default {
 
           })
         },
+        getActiveCategories(data){
+          axios.get("getActiveCategories").then((response)=>{
+              data.commit("categories",response.data.categories);
+          }).catch((error)=>{
+
+          })
+        },
         getPosts(data){
           axios.get("getPosts").then((response)=>{
               data.commit("posts",response.data.posts);

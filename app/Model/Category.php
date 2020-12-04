@@ -35,7 +35,7 @@ class Category extends Model
 
     public static function updateCategoryInfo($request){
 
-               $category          = new Category();
+               $category = Category::find($request->id);
                $category->name    =$request->name;
                $category->slug    =slugify($request->name);
                $category->status  =$request->status;

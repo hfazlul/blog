@@ -42,30 +42,21 @@
                             <td>{{++index}}</td>
                             <td>{{category.name|subString(3)}}</td>
                             <td>{{category.slug |subString(10)}}...</td>
-                            <td>
-                                <button :class="statusColor(category.status)" class="btn btn-xs">
-                                    {{statusName(category.status)}}
-
-                                </button>
-
-                            </td>
+                            <td>{{statusName(category.status)}} </td>
                             <td>{{category.created_at|time}}</td>
                             <td style="height:50px;">
 
-                                <!-- <a class="btn btn-warning btn-xs" href="">
-                                    <span class="fa fa-arrow-down "></span>
+
+                                <a href="" :class="statusColor(category.status)" class="btn btn-xs" @click.prevent="status(category.id)">
+                                    <span :class="statusArrow(category.status)"></span>
                                 </a>
-                                 -->
+
                                 <router-link :to = "`/edit-category/${category.slug}`" class="edit-btn btn btn-success btn-xs">
                                     <span class="fa fa-edit "></span>
                                 </router-link>
 
                                 <a href="" class="delete-btn btn btn-danger btn-xs" @click.prevent="remove(category.slug)">
                                     <span class="fa fa-trash "></span>
-
-                                    <!-- <form id="deleteCategoryForm" action="" method="get">
-                                        <input type="hidden" value="" name="id"/>
-                                    </form> -->
                                 </a>
 
                             </td>
@@ -141,10 +132,10 @@ export default {
             let data ={ 0: "btn-warning", 1: "btn-success"}
             return data [status];
         },
-        // statusArrow: function (status) {
-        //     let data ={ 0: "fa fa-arrow-down", 1: "fa fa-arrow-up"}
-        //     return data [status];
-        // },
+        statusArrow: function (status) {
+            let data ={ 0: "fa fa-arrow-down", 1: "fa fa-arrow-up"}
+            return data [status];
+        },
         remove: function (slug) {
             this.confirm( ()=>{
                    axios.get("remove-category/"+slug).then((response)=>{
@@ -161,29 +152,13 @@ export default {
             });
 
         },
-        published: function (id) {
-                Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, published,unPublishe it!'
-            }).then((result) => {
-            if (result.isConfirmed) {
-                  axios.get("published-category/"+id).then((response)=>{
-                  this.$store.dispatch("getCategories");
-              Swal.fire(
-                'success'
-                )
+        status: function (id) {
+                   axios.get("status-category/"+id).then((response)=>{
+                        this.$store.dispatch("getCategories");
+                        toastr.success('Category change status success');
+                        }).catch((error)=>{
 
-                }).catch((error)=>{
-
-                })
-              }
-            })
-
+                        })
         },
 
         emptyData(){

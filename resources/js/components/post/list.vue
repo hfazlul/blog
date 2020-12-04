@@ -23,7 +23,7 @@
                             <h6>Check All</h6>
                             <tr class="text-center">
                              <th>
-                                 <input type="checkbox">
+                                 <input type="checkbox" :disabled="emptyData()" @click="selectAll" v-model="selectIds">
                              </th>
                             <th>List</th>
                             <th>User Name</th>
@@ -39,38 +39,26 @@
 
                             <tr v-for="(post,index) in posts" class="text-center">
                             <td>
-                                <input type="checkbox" :value="post.id" v-model="selectIds" >
+                                <input type="checkbox" :value="post.id" v-model="selectId">
                             </td>
                             <td>{{++index}}</td>
-                            <td>{{post.user.name | subString(10)}}</td>
-                            <td>{{post.category.name | subString(10)}}....</td>
-                            <td>{{post.title | subString(15)}}....</td>
+                            <td>{{post.user.name|subString(10)}}</td>
+                            <td>{{post.category.name|subString(10)}}....</td>
+                            <td>{{post.title|subString(15)}}....</td>
                             <td><img width="60" :src="post.thumbnail" alt=""></td>
-                            <td>{{statusName(post.status) | subString(5)}}....</td>
-                            <td>{{post.created_at | time}}</td>
+                            <td>{{statusName(post.status)}}</td>
+                            <td>{{post.created_at|time}}</td>
                             <td style="height:50px;">
 
-                                <a class="btn btn-xs" :class="statusColor(post.status)" v-if="statusColor(post.status)" href="" @click.prevent="published(post.id)">
-                                    <span class="" :class="statusArrow(post.status)" ></span>
-                                </a>
-                                <a class="btn btn-xs" :class="statusColor(post.status)" v-else="statusColor(post.status)" href="" @click.prevent="published(post.id)">
-                                    <span class="" :class="statusArrow(post.status)" ></span>
-                                </a>
-
-                                <!-- <a class="btn btn-warning btn-xs" href="">
-                                    <span class="fa fa-arrow-down "></span>
-                                </a>
-                                 -->
+                                    <a href="" :class="statusColor(post.status)" class="btn btn-xs" @click.prevent="status(post.id)">
+                                    <span :class="statusArrow(post.status)"></span>
+                                    </a>
                                   <router-link :to = "`/edit-post/${post.slug}`" class="edit-btn btn btn-success btn-xs">
                                     <span class="fa fa-edit "></span>
-                                </router-link>
+                                  </router-link>
 
-                                <a href="" class="delete-btn btn btn-danger btn-xs" @click.prevent="remove(post.slug)">
+                                <a href="" class="btn btn btn-danger btn-xs" @click.prevent="remove(post.slug)">
                                     <span class="fa fa-trash "></span>
-
-                                    <!-- <form id="deleteCategoryForm" action="" method="get">
-                                        <input type="hidden" value="" name="id"/>
-                                    </form> -->
                                 </a>
 
                             </td>
@@ -89,12 +77,14 @@
                 <br/>
 
                    <div class="dropdown margin-top:2">
-                        <a class="btn btn-info dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown">
+                        <button class="btn btn-info dropdown-toggle" :disabled="!isSelected" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown">
                            Select Checkbox
-                        </a>
+                        </button>
 
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                            <a class="dropdown-item" href="#">Click Remove</a>
+                          <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                            <button  class="dropdown-item" @click="removeItems(selectId)">Remove</button>
+                            <button  class="dropdown-item" @click="changeStatus(selectId,'published')">Published</button>
+                            <button  class="dropdown-item" @click="changeStatus(selectId,'draft')">Unpublished</button>
                         </div>
 
                     </div>
@@ -110,7 +100,9 @@ export default {
     name: "PostList",
      data: function () {
         return{
-            selectIds: []
+            selectId: [],
+            selectIds: false,
+            isSelected:false,
         }
     },
 
@@ -119,14 +111,21 @@ export default {
             this.$store.dispatch("getPosts");
     },
 
+     watch:{
+        selectId: function(selectId){
+            this.isSelected=(selectId.length > 0);
+            this.selectIds= (selectId.length === this.posts.length);
+        }
+    },
+
     computed:{
        posts(){
             return this.$store.getters.posts;
         }
     },
-    methods:{
+     methods:{
         statusName: function (status) {
-            let data ={ draft: "Unpublished",published: "Published"}
+            let data ={ draft: "Unpublished ",published: "Published"}
             return data [status];
         },
         statusColor: function (status) {
@@ -138,58 +137,70 @@ export default {
             return data [status];
         },
         remove: function (slug) {
-         Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-            if (result.isConfirmed) {
-                  axios.get("remove-post/"+slug).then((response)=>{
-                  this.$store.dispatch("getPosts");
-              Swal.fire(
-                'Deleted!',
-                'Your file has been deleted.',
-                'success'
-                )
+            this.confirm( ()=>{
+                   axios.get("remove-post/"+slug).then((response)=>{
+                        this.$store.dispatch("getPosts");
+                    Swal.fire(
+                        'Deleted!',
+                        'Your file has been deleted.',
+                        'success'
+                        )
 
-                }).catch((error)=>{
+                        }).catch((error)=>{
 
-                })
-              }
-            })
-        },
-        published: function (id) {
-                Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, published,unPublishe it!'
-            }).then((result) => {
-            if (result.isConfirmed) {
-                  axios.get("published-category/"+id).then((response)=>{
-                  this.$store.dispatch("getPosts");
-              Swal.fire(
-                'success'
-                )
-
-                }).catch((error)=>{
-
-                })
-              }
-            })
+                        })
+            });
 
         },
+        status: function (id) {
+                   axios.get("status-post/"+id).then((response)=>{
+                        this.$store.dispatch("getPosts");
+                        toastr.success('Post change status success');
+                        }).catch((error)=>{
 
-         emptyData(){
+                        })
+        },
+
+        emptyData(){
             return (this.posts.length <1);
-        }
+        },
+        selectAll: function(event){
+            if(event.target.checked == false){
+                this.selectId=[];
+
+            }else{
+                this.posts.forEach((post)=>{
+                    if(this.selectId.indexOf(post.id)== -1){
+                        this.selectId.push(post.id);
+                    }
+                });
+            }
+        },
+        removeItems: function(selectId){
+            this.confirm( ()=>{
+           axios.post("/posts/remove-items",{ids:selectId}).then((response)=>{
+                this.selectId= [];
+                this.selectIds= false;
+                this.isSelected=false;
+                toastr.success(response.data.total +'Post Delete success');
+                this.$store.dispatch("getPosts");
+           }).catch((error)=>{
+
+           })
+            });
+        },
+        changeStatus: function(selectId, status){
+           axios.post("/posts/change-status",{ids:selectId, status:status}).then((response)=>{
+                this.selectId= [];
+                this.selectIds= false;
+                this.isSelected=false;
+                toastr.success(response.data.total +'Post'+' '+status+' '+ 'success');
+                this.$store.dispatch("getPosts");
+           }).catch((error)=>{
+
+           })
+        },
+
 
 
     }

@@ -23,6 +23,14 @@ class CategoryController extends Controller
             'categories' => $categories
         ], 200);
     }
+    public function getActiveCategories()
+    {
+        $categories=Category::where('status', 1)->get();
+
+        return response()->json([
+            'categories' => $categories
+        ], 200);
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -68,16 +76,15 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function published($id)
+    public function status($id)
     {
-        $category=Category::find($id);
-
-        if( $category->status=1){
+        $category = Category::find($id);
+        if( $category->status==1){
             $category->status=0;
             $category->save();
             $success=true;
         }
-         elseif($category->status=0){
+         elseif($category->status==0){
             $category->status=1;
             $category->save();
             $success=true;
@@ -87,24 +94,6 @@ class CategoryController extends Controller
         }
         return response()->json(['success'=>$success], 200);
     }
-    // public function unPublished($id)
-    // {
-    //     $category=Category::find($id);
-
-    //     if( $category->status=0){
-    //         $category->status=1;
-    //         $category->save();
-    //         $success=true;
-    //     }
-
-
-
-    //     else{
-    //         $success=false;
-    //     }
-    //     return response()->json(['success'=>$success], 200);
-    // }
-
     /**
      * Update the specified resource in storage.
      *

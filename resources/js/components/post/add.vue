@@ -2,7 +2,7 @@
 <template>
   <div class="row justify-content-around " style="margin-bottom:150px;">
           <!-- left column -->
-          <div class="col-md-6">
+          <div class="col-md-8">
             <!-- general form elements -->
             <div class="card card-info">
 
@@ -23,19 +23,32 @@
 
               <!-- form start -->
 
-                        <form role="form" @submit.prevent="addPost">
+                        <form role="form" @submit.prevent="addPost" enctype="multipart/form-data">
                             <div class="card-body">
                                     <div class="form-group">
-                                        <label >Category Name</label>
-                                        <input type="text" class="form-control" :class="{ 'is-invalid': form.errors.has('name') }" name="name" placeholder="add Category" v-model="form.name">
-                                        <has-error :form="form" field="name"></has-error>
+                                        <label for="category_id">Category Select</label>
+                                        <select id="category_id" class="form-control" :class="{ 'is-invalid': form.errors.has('category_id') }"  v-model="form.category_id">
+                                            <option value="" >Select any one</option>
+                                            <option :value="cat.id" v-for="cat in categories">{{cat.name}}</option>
+                                        </select>
+                                        <has-error :form="form" field="category_id"></has-error>
+                                    </div>
+                                     <div class="form-group">
+                                        <label >Post Title</label>
+                                        <input type="text" class="form-control" :class="{ 'is-invalid': form.errors.has('title') }" name="title" placeholder="Post title" v-model="form.title">
+                                        <has-error :form="form" field="title"></has-error>
+                                    </div>
+                                     <div class="form-group">
+                                        <label >Post Description</label>
+                                        <textarea type="text" rows="5" class="form-control" :class="{ 'is-invalid': form.errors.has('description') }" name="description" placeholder="Post description" v-model="form.description"></textarea>
+                                        <has-error :form="form" field="description"></has-error>
                                     </div>
 
                                     <div class="form-group">
                                         <label >Publication Status</label>
                                         <div class="form-group">
-                                            <label><input type="radio" class=""   name="status" value="1" v-model="form.status"/>Published</label>
-                                            <label><input type="radio" class=""  name="status" value="0" v-model="form.status"/>UnPublished</label>
+                                            <label><input type="radio" class="" name="status" value="1" v-model="form.status"/>Published</label>
+                                            <label><input type="radio" class="" name="status" value="0" v-model="form.status"/>UnPublished</label>
 
                                         </div>
                                         <span :class="{ 'is-invalid': form.errors.has('status') }" ></span>
@@ -64,12 +77,22 @@
              return {
                  form: new Form({
                     name:'',
-                    status: ''
+                    status: '',
+                    category_id: ''
                  })
 
              }
 
          },
+          mounted() {
+            this.$store.dispatch("getActiveCategories");
+            },
+             computed:{
+                categories(){
+                        return this.$store.getters.categories;
+                    }
+                },
+
          methods: {
              addPost: function () {
                  let test =this;

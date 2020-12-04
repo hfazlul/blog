@@ -63,17 +63,17 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function published($id)
+    public function status($id)
     {
         $post=Post::find($id);
 
-        if( $post->status=1){
-            $post->status=0;
+        if( $post->status== 'published'){
+            $post->status='draft';
             $post->save();
             $success=true;
         }
-         elseif($post->status=0){
-            $post->status=1;
+         elseif($post->status=='draft'){
+            $post->status='published';
             $post->save();
             $success=true;
         }
@@ -82,24 +82,6 @@ class PostController extends Controller
         }
         return response()->json(['success'=>$success], 200);
     }
-    // public function unPublished($id)
-    // {
-    //     $category=Category::find($id);
-
-    //     if( $category->status=0){
-    //         $category->status=1;
-    //         $category->save();
-    //         $success=true;
-    //     }
-
-
-
-    //     else{
-    //         $success=false;
-    //     }
-    //     return response()->json(['success'=>$success], 200);
-    // }
-
     /**
      * Update the specified resource in storage.
      *
@@ -135,5 +117,30 @@ class PostController extends Controller
        }
 
        return response()->json(['success'=>$success], 200);
+    }
+    public function removeItems(Request $request){
+        $sl=0;
+      foreach($request->ids as $id){
+          $category=Post::find($id);
+          $category->delete();
+          $sl++;
+
+      }
+      $success= $sl > 0 ? true : false;
+      return response()->json(['success'=> $success, 'total'=>$sl], 200);
+    }
+
+    public function changeStatus(Request $request){
+        $sl=0;
+        foreach($request->ids as $id){
+           $category=Post::find($id);
+           $category->status =$request->status;
+           $category->save();
+           $sl++;
+
+          }
+         $success= $sl > 0 ? true : false;
+         return response()->json(['success'=> $success, 'total'=>$sl], 200);
+
     }
 }

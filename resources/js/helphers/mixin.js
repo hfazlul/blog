@@ -16,6 +16,21 @@ methods:{
         if (result.isConfirmed) callback();
 
         });
-    }
+    },
+   confirm2: function (callback) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to chage this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, change it!'
+        }).then((result) => {
+
+        if (result.isConfirmed) callback();
+
+        });
+    },
 }
 });

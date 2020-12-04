@@ -4771,15 +4771,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "CategoryList",
   data: function data() {
@@ -4818,10 +4809,13 @@ __webpack_require__.r(__webpack_exports__);
       };
       return data[status];
     },
-    // statusArrow: function (status) {
-    //     let data ={ 0: "fa fa-arrow-down", 1: "fa fa-arrow-up"}
-    //     return data [status];
-    // },
+    statusArrow: function statusArrow(status) {
+      var data = {
+        0: "fa fa-arrow-down",
+        1: "fa fa-arrow-up"
+      };
+      return data[status];
+    },
     remove: function remove(slug) {
       var _this = this;
 
@@ -4833,26 +4827,14 @@ __webpack_require__.r(__webpack_exports__);
         })["catch"](function (error) {});
       });
     },
-    published: function published(id) {
+    status: function status(id) {
       var _this2 = this;
 
-      Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, published,unPublishe it!'
-      }).then(function (result) {
-        if (result.isConfirmed) {
-          axios.get("published-category/" + id).then(function (response) {
-            _this2.$store.dispatch("getCategories");
+      axios.get("status-category/" + id).then(function (response) {
+        _this2.$store.dispatch("getCategories");
 
-            Swal.fire('success');
-          })["catch"](function (error) {});
-        }
-      });
+        toastr.success('Category change status success');
+      })["catch"](function (error) {});
     },
     emptyData: function emptyData() {
       return this.categories.length < 1;
@@ -5583,15 +5565,37 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "PostAdd",
   data: function data() {
     return {
       form: new Form({
         name: '',
-        status: ''
+        status: '',
+        category_id: ''
       })
     };
+  },
+  mounted: function mounted() {
+    this.$store.dispatch("getActiveCategories");
+  },
+  computed: {
+    categories: function categories() {
+      return this.$store.getters.categories;
+    }
   },
   methods: {
     addPost: function addPost() {
@@ -5819,25 +5823,23 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "PostList",
   data: function data() {
     return {
-      selectIds: []
+      selectId: [],
+      selectIds: false,
+      isSelected: false
     };
   },
   mounted: function mounted() {
     this.$store.dispatch("getPosts");
+  },
+  watch: {
+    selectId: function selectId(_selectId) {
+      this.isSelected = _selectId.length > 0;
+      this.selectIds = _selectId.length === this.posts.length;
+    }
   },
   computed: {
     posts: function posts() {
@@ -5847,7 +5849,7 @@ __webpack_require__.r(__webpack_exports__);
   methods: {
     statusName: function statusName(status) {
       var data = {
-        draft: "Unpublished",
+        draft: "Unpublished ",
         published: "Published"
       };
       return data[status];
@@ -5869,47 +5871,69 @@ __webpack_require__.r(__webpack_exports__);
     remove: function remove(slug) {
       var _this = this;
 
-      Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
-      }).then(function (result) {
-        if (result.isConfirmed) {
-          axios.get("remove-post/" + slug).then(function (response) {
-            _this.$store.dispatch("getPosts");
+      this.confirm(function () {
+        axios.get("remove-post/" + slug).then(function (response) {
+          _this.$store.dispatch("getPosts");
 
-            Swal.fire('Deleted!', 'Your file has been deleted.', 'success');
-          })["catch"](function (error) {});
-        }
+          Swal.fire('Deleted!', 'Your file has been deleted.', 'success');
+        })["catch"](function (error) {});
       });
     },
-    published: function published(id) {
+    status: function status(id) {
       var _this2 = this;
 
-      Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, published,unPublishe it!'
-      }).then(function (result) {
-        if (result.isConfirmed) {
-          axios.get("published-category/" + id).then(function (response) {
-            _this2.$store.dispatch("getPosts");
+      axios.get("status-post/" + id).then(function (response) {
+        _this2.$store.dispatch("getPosts");
 
-            Swal.fire('success');
-          })["catch"](function (error) {});
-        }
-      });
+        toastr.success('Post change status success');
+      })["catch"](function (error) {});
     },
     emptyData: function emptyData() {
       return this.posts.length < 1;
+    },
+    selectAll: function selectAll(event) {
+      var _this3 = this;
+
+      if (event.target.checked == false) {
+        this.selectId = [];
+      } else {
+        this.posts.forEach(function (post) {
+          if (_this3.selectId.indexOf(post.id) == -1) {
+            _this3.selectId.push(post.id);
+          }
+        });
+      }
+    },
+    removeItems: function removeItems(selectId) {
+      var _this4 = this;
+
+      this.confirm(function () {
+        axios.post("/posts/remove-items", {
+          ids: selectId
+        }).then(function (response) {
+          _this4.selectId = [];
+          _this4.selectIds = false;
+          _this4.isSelected = false;
+          toastr.success(response.data.total + 'Post Delete success');
+
+          _this4.$store.dispatch("getPosts");
+        })["catch"](function (error) {});
+      });
+    },
+    changeStatus: function changeStatus(selectId, status) {
+      var _this5 = this;
+
+      axios.post("/posts/change-status", {
+        ids: selectId,
+        status: status
+      }).then(function (response) {
+        _this5.selectId = [];
+        _this5.selectIds = false;
+        _this5.isSelected = false;
+        toastr.success(response.data.total + 'Post' + ' ' + status + ' ' + 'success');
+
+        _this5.$store.dispatch("getPosts");
+      })["catch"](function (error) {});
     }
   }
 });
@@ -68546,20 +68570,7 @@ var render = function() {
                       ]),
                       _vm._v(" "),
                       _c("td", [
-                        _c(
-                          "button",
-                          {
-                            staticClass: "btn btn-xs",
-                            class: _vm.statusColor(category.status)
-                          },
-                          [
-                            _vm._v(
-                              "\n                            " +
-                                _vm._s(_vm.statusName(category.status)) +
-                                "\n\n                        "
-                            )
-                          ]
-                        )
+                        _vm._v(_vm._s(_vm.statusName(category.status)) + " ")
                       ]),
                       _vm._v(" "),
                       _c("td", [
@@ -68570,6 +68581,26 @@ var render = function() {
                         "td",
                         { staticStyle: { height: "50px" } },
                         [
+                          _c(
+                            "a",
+                            {
+                              staticClass: "btn btn-xs",
+                              class: _vm.statusColor(category.status),
+                              attrs: { href: "" },
+                              on: {
+                                click: function($event) {
+                                  $event.preventDefault()
+                                  return _vm.status(category.id)
+                                }
+                              }
+                            },
+                            [
+                              _c("span", {
+                                class: _vm.statusArrow(category.status)
+                              })
+                            ]
+                          ),
+                          _vm._v(" "),
                           _c(
                             "router-link",
                             {
@@ -69789,7 +69820,7 @@ var render = function() {
       staticStyle: { "margin-bottom": "150px" }
     },
     [
-      _c("div", { staticClass: "col-md-6" }, [
+      _c("div", { staticClass: "col-md-8" }, [
         _c("div", { staticClass: "card card-info" }, [
           _c("div", { staticClass: "card-header" }, [
             _c("div", { staticClass: "card-header" }, [
@@ -69825,7 +69856,7 @@ var render = function() {
           _c(
             "form",
             {
-              attrs: { role: "form" },
+              attrs: { role: "form", enctype: "multipart/form-data" },
               on: {
                 submit: function($event) {
                   $event.preventDefault()
@@ -69839,37 +69870,145 @@ var render = function() {
                   "div",
                   { staticClass: "form-group" },
                   [
-                    _c("label", [_vm._v("Category Name")]),
+                    _c("label", { attrs: { for: "category_id" } }, [
+                      _vm._v("Category Select")
+                    ]),
+                    _vm._v(" "),
+                    _c(
+                      "select",
+                      {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.form.category_id,
+                            expression: "form.category_id"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        class: {
+                          "is-invalid": _vm.form.errors.has("category_id")
+                        },
+                        attrs: { id: "category_id" },
+                        on: {
+                          change: function($event) {
+                            var $$selectedVal = Array.prototype.filter
+                              .call($event.target.options, function(o) {
+                                return o.selected
+                              })
+                              .map(function(o) {
+                                var val = "_value" in o ? o._value : o.value
+                                return val
+                              })
+                            _vm.$set(
+                              _vm.form,
+                              "category_id",
+                              $event.target.multiple
+                                ? $$selectedVal
+                                : $$selectedVal[0]
+                            )
+                          }
+                        }
+                      },
+                      [
+                        _c("option", { attrs: { value: "" } }, [
+                          _vm._v("Select any one")
+                        ]),
+                        _vm._v(" "),
+                        _vm._l(_vm.categories, function(cat) {
+                          return _c("option", { domProps: { value: cat.id } }, [
+                            _vm._v(_vm._s(cat.name))
+                          ])
+                        })
+                      ],
+                      2
+                    ),
+                    _vm._v(" "),
+                    _c("has-error", {
+                      attrs: { form: _vm.form, field: "category_id" }
+                    })
+                  ],
+                  1
+                ),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  { staticClass: "form-group" },
+                  [
+                    _c("label", [_vm._v("Post Title")]),
                     _vm._v(" "),
                     _c("input", {
                       directives: [
                         {
                           name: "model",
                           rawName: "v-model",
-                          value: _vm.form.name,
-                          expression: "form.name"
+                          value: _vm.form.title,
+                          expression: "form.title"
                         }
                       ],
                       staticClass: "form-control",
-                      class: { "is-invalid": _vm.form.errors.has("name") },
+                      class: { "is-invalid": _vm.form.errors.has("title") },
                       attrs: {
                         type: "text",
-                        name: "name",
-                        placeholder: "add Category"
+                        name: "title",
+                        placeholder: "Post title"
                       },
-                      domProps: { value: _vm.form.name },
+                      domProps: { value: _vm.form.title },
                       on: {
                         input: function($event) {
                           if ($event.target.composing) {
                             return
                           }
-                          _vm.$set(_vm.form, "name", $event.target.value)
+                          _vm.$set(_vm.form, "title", $event.target.value)
                         }
                       }
                     }),
                     _vm._v(" "),
                     _c("has-error", {
-                      attrs: { form: _vm.form, field: "name" }
+                      attrs: { form: _vm.form, field: "title" }
+                    })
+                  ],
+                  1
+                ),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  { staticClass: "form-group" },
+                  [
+                    _c("label", [_vm._v("Post Description")]),
+                    _vm._v(" "),
+                    _c("textarea", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.form.description,
+                          expression: "form.description"
+                        }
+                      ],
+                      staticClass: "form-control",
+                      class: {
+                        "is-invalid": _vm.form.errors.has("description")
+                      },
+                      attrs: {
+                        type: "text",
+                        rows: "5",
+                        name: "description",
+                        placeholder: "Post description"
+                      },
+                      domProps: { value: _vm.form.description },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.$set(_vm.form, "description", $event.target.value)
+                        }
+                      }
+                    }),
+                    _vm._v(" "),
+                    _c("has-error", {
+                      attrs: { form: _vm.form, field: "description" }
                     })
                   ],
                   1
@@ -70209,7 +70348,70 @@ var render = function() {
               attrs: { id: "example2" }
             },
             [
-              _vm._m(0),
+              _c("thead", [
+                _c("h6", [_vm._v("Check All")]),
+                _vm._v(" "),
+                _c("tr", { staticClass: "text-center" }, [
+                  _c("th", [
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.selectIds,
+                          expression: "selectIds"
+                        }
+                      ],
+                      attrs: { type: "checkbox", disabled: _vm.emptyData() },
+                      domProps: {
+                        checked: Array.isArray(_vm.selectIds)
+                          ? _vm._i(_vm.selectIds, null) > -1
+                          : _vm.selectIds
+                      },
+                      on: {
+                        click: _vm.selectAll,
+                        change: function($event) {
+                          var $$a = _vm.selectIds,
+                            $$el = $event.target,
+                            $$c = $$el.checked ? true : false
+                          if (Array.isArray($$a)) {
+                            var $$v = null,
+                              $$i = _vm._i($$a, $$v)
+                            if ($$el.checked) {
+                              $$i < 0 && (_vm.selectIds = $$a.concat([$$v]))
+                            } else {
+                              $$i > -1 &&
+                                (_vm.selectIds = $$a
+                                  .slice(0, $$i)
+                                  .concat($$a.slice($$i + 1)))
+                            }
+                          } else {
+                            _vm.selectIds = $$c
+                          }
+                        }
+                      }
+                    })
+                  ]),
+                  _vm._v(" "),
+                  _c("th", [_vm._v("List")]),
+                  _vm._v(" "),
+                  _c("th", [_vm._v("User Name")]),
+                  _vm._v(" "),
+                  _c("th", [_vm._v("Category Name")]),
+                  _vm._v(" "),
+                  _c("th", [_vm._v("Title")]),
+                  _vm._v(" "),
+                  _c("th", [_vm._v("Thumbnail")]),
+                  _vm._v(" "),
+                  _c("th", [_vm._v("Status")]),
+                  _vm._v(" "),
+                  _c("th", [_vm._v("Time")]),
+                  _vm._v(" "),
+                  _c("th", { staticStyle: { height: "50px" } }, [
+                    _vm._v("Action")
+                  ])
+                ])
+              ]),
               _vm._v(" "),
               _c(
                 "tbody",
@@ -70222,35 +70424,35 @@ var render = function() {
                             {
                               name: "model",
                               rawName: "v-model",
-                              value: _vm.selectIds,
-                              expression: "selectIds"
+                              value: _vm.selectId,
+                              expression: "selectId"
                             }
                           ],
                           attrs: { type: "checkbox" },
                           domProps: {
                             value: post.id,
-                            checked: Array.isArray(_vm.selectIds)
-                              ? _vm._i(_vm.selectIds, post.id) > -1
-                              : _vm.selectIds
+                            checked: Array.isArray(_vm.selectId)
+                              ? _vm._i(_vm.selectId, post.id) > -1
+                              : _vm.selectId
                           },
                           on: {
                             change: function($event) {
-                              var $$a = _vm.selectIds,
+                              var $$a = _vm.selectId,
                                 $$el = $event.target,
                                 $$c = $$el.checked ? true : false
                               if (Array.isArray($$a)) {
                                 var $$v = post.id,
                                   $$i = _vm._i($$a, $$v)
                                 if ($$el.checked) {
-                                  $$i < 0 && (_vm.selectIds = $$a.concat([$$v]))
+                                  $$i < 0 && (_vm.selectId = $$a.concat([$$v]))
                                 } else {
                                   $$i > -1 &&
-                                    (_vm.selectIds = $$a
+                                    (_vm.selectId = $$a
                                       .slice(0, $$i)
                                       .concat($$a.slice($$i + 1)))
                                 }
                               } else {
-                                _vm.selectIds = $$c
+                                _vm.selectId = $$c
                               }
                             }
                           }
@@ -70282,13 +70484,7 @@ var render = function() {
                         })
                       ]),
                       _vm._v(" "),
-                      _c("td", [
-                        _vm._v(
-                          _vm._s(
-                            _vm._f("subString")(_vm.statusName(post.status), 5)
-                          ) + "...."
-                        )
-                      ]),
+                      _c("td", [_vm._v(_vm._s(_vm.statusName(post.status)))]),
                       _vm._v(" "),
                       _c("td", [
                         _vm._v(_vm._s(_vm._f("time")(post.created_at)))
@@ -70298,45 +70494,25 @@ var render = function() {
                         "td",
                         { staticStyle: { height: "50px" } },
                         [
-                          _vm.statusColor(post.status)
-                            ? _c(
-                                "a",
-                                {
-                                  staticClass: "btn btn-xs",
-                                  class: _vm.statusColor(post.status),
-                                  attrs: { href: "" },
-                                  on: {
-                                    click: function($event) {
-                                      $event.preventDefault()
-                                      return _vm.published(post.id)
-                                    }
-                                  }
-                                },
-                                [
-                                  _c("span", {
-                                    class: _vm.statusArrow(post.status)
-                                  })
-                                ]
-                              )
-                            : _c(
-                                "a",
-                                {
-                                  staticClass: "btn btn-xs",
-                                  class: _vm.statusColor(post.status),
-                                  attrs: { href: "" },
-                                  on: {
-                                    click: function($event) {
-                                      $event.preventDefault()
-                                      return _vm.published(post.id)
-                                    }
-                                  }
-                                },
-                                [
-                                  _c("span", {
-                                    class: _vm.statusArrow(post.status)
-                                  })
-                                ]
-                              ),
+                          _c(
+                            "a",
+                            {
+                              staticClass: "btn btn-xs",
+                              class: _vm.statusColor(post.status),
+                              attrs: { href: "" },
+                              on: {
+                                click: function($event) {
+                                  $event.preventDefault()
+                                  return _vm.status(post.id)
+                                }
+                              }
+                            },
+                            [
+                              _c("span", {
+                                class: _vm.statusArrow(post.status)
+                              })
+                            ]
+                          ),
                           _vm._v(" "),
                           _c(
                             "router-link",
@@ -70350,7 +70526,7 @@ var render = function() {
                           _c(
                             "a",
                             {
-                              staticClass: "delete-btn btn btn-danger btn-xs",
+                              staticClass: "btn btn btn-danger btn-xs",
                               attrs: { href: "" },
                               on: {
                                 click: function($event) {
@@ -70367,7 +70543,7 @@ var render = function() {
                     ])
                   }),
                   _vm._v(" "),
-                  _vm.emptyData() ? _c("tr", [_vm._m(1)]) : _vm._e()
+                  _vm.emptyData() ? _c("tr", [_vm._m(0)]) : _vm._e()
                 ],
                 2
               )
@@ -70377,7 +70553,74 @@ var render = function() {
         _vm._v(" "),
         _c("br"),
         _vm._v(" "),
-        _vm._m(2)
+        _c("div", { staticClass: "dropdown margin-top:2" }, [
+          _c(
+            "button",
+            {
+              staticClass: "btn btn-info dropdown-toggle",
+              attrs: {
+                disabled: !_vm.isSelected,
+                href: "#",
+                role: "button",
+                id: "dropdownMenuLink",
+                "data-toggle": "dropdown"
+              }
+            },
+            [
+              _vm._v(
+                "\n                     Select Checkbox\n                  "
+              )
+            ]
+          ),
+          _vm._v(" "),
+          _c(
+            "div",
+            {
+              staticClass: "dropdown-menu",
+              attrs: { "aria-labelledby": "dropdownMenuLink" }
+            },
+            [
+              _c(
+                "button",
+                {
+                  staticClass: "dropdown-item",
+                  on: {
+                    click: function($event) {
+                      return _vm.removeItems(_vm.selectId)
+                    }
+                  }
+                },
+                [_vm._v("Remove")]
+              ),
+              _vm._v(" "),
+              _c(
+                "button",
+                {
+                  staticClass: "dropdown-item",
+                  on: {
+                    click: function($event) {
+                      return _vm.changeStatus(_vm.selectId, "published")
+                    }
+                  }
+                },
+                [_vm._v("Published")]
+              ),
+              _vm._v(" "),
+              _c(
+                "button",
+                {
+                  staticClass: "dropdown-item",
+                  on: {
+                    click: function($event) {
+                      return _vm.changeStatus(_vm.selectId, "draft")
+                    }
+                  }
+                },
+                [_vm._v("Unpublished")]
+              )
+            ]
+          )
+        ])
       ])
     ])
   ])
@@ -70387,71 +70630,10 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("thead", [
-      _c("h6", [_vm._v("Check All")]),
-      _vm._v(" "),
-      _c("tr", { staticClass: "text-center" }, [
-        _c("th", [_c("input", { attrs: { type: "checkbox" } })]),
-        _vm._v(" "),
-        _c("th", [_vm._v("List")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("User Name")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Category Name")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Title")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Thumbnail")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Status")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Time")]),
-        _vm._v(" "),
-        _c("th", { staticStyle: { height: "50px" } }, [_vm._v("Action")])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
     return _c("td", { attrs: { colspan: "10" } }, [
       _c("h5", { staticClass: "text-center text-danger" }, [
         _vm._v("Data not found!")
       ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "dropdown margin-top:2" }, [
-      _c(
-        "a",
-        {
-          staticClass: "btn btn-info dropdown-toggle",
-          attrs: {
-            href: "#",
-            role: "button",
-            id: "dropdownMenuLink",
-            "data-toggle": "dropdown"
-          }
-        },
-        [_vm._v("\n                     Select Checkbox\n                  ")]
-      ),
-      _vm._v(" "),
-      _c(
-        "div",
-        {
-          staticClass: "dropdown-menu",
-          attrs: { "aria-labelledby": "dropdownMenuLink" }
-        },
-        [
-          _c("a", { staticClass: "dropdown-item", attrs: { href: "#" } }, [
-            _vm._v("Click Remove")
-          ])
-        ]
-      )
     ])
   }
 ]
@@ -87735,6 +87917,19 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.mixin({
       }).then(function (result) {
         if (result.isConfirmed) callback();
       });
+    },
+    confirm2: function confirm2(callback) {
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to chage this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, change it!'
+      }).then(function (result) {
+        if (result.isConfirmed) callback();
+      });
     }
   }
 });
@@ -87821,6 +88016,11 @@ __webpack_require__.r(__webpack_exports__);
   actions: {
     getCategories: function getCategories(data) {
       axios.get("getCategories").then(function (response) {
+        data.commit("categories", response.data.categories);
+      })["catch"](function (error) {});
+    },
+    getActiveCategories: function getActiveCategories(data) {
+      axios.get("getActiveCategories").then(function (response) {
         data.commit("categories", response.data.categories);
       })["catch"](function (error) {});
     },

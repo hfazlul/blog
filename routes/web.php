@@ -36,21 +36,21 @@ Route::get('/getCategories',[
     'uses' => 'backend\CategoryController@index',
     'as'   => 'getCategories'
 ]);
+Route::get('/getActiveCategories',[
+    'uses' => 'backend\CategoryController@getActiveCategories',
+    'as'   => 'getActiveCategories'
+]);
 Route::get('/show-category/{slug}',[
     'uses' => 'backend\CategoryController@show',
     'as'   => 'show-category'
 ]);
-Route::get('/published-category/{id}',[
-    'uses' => 'backend\CategoryController@published',
-    'as'   => 'published-category'
-]);
-// Route::get('/unPublished-category/{id}',[
-//     'uses' => 'backend\CategoryController@unPublished',
-//     'as'   => 'unPublished-category'
-// ]);
 Route::post('/updateCategory',[
     'uses' => 'backend\CategoryController@update',
     'as'   => 'updateCategory'
+]);
+Route::get('/status-category/{id}',[
+    'uses' => 'backend\CategoryController@status',
+    'as'   => 'status-category'
 ]);
 Route::get('/remove-category/{slug}',[
     'uses' => 'backend\CategoryController@destroy',
@@ -79,37 +79,31 @@ Route::get('/getPosts',[
 ]);
 Route::get('/show-post/{slug}',[
     'uses' => 'backend\PostController@show',
-    'as'   => 'show-category'
+    'as'   => 'show-post'
 ]);
-Route::get('/published-category/{id}',[
-    'uses' => 'backend\PostController@published',
-    'as'   => 'published-category'
+Route::post('/updatePost',[
+    'uses' => 'backend\PostController@update',
+    'as'   => 'updatePost'
 ]);
-// Route::get('/unPublished-category/{id}',[
-//     'uses' => 'backend\CategoryController@unPublished',
-//     'as'   => 'unPublished-category'
-// ]);
-// Route::post('/updateCategory',[
-//     'uses' => 'backend\PostController@update',
-//     'as'   => 'updateCategory'
-// ]);
+Route::get('/status-post/{id}',[
+    'uses' => 'backend\PostController@status',
+    'as'   => 'status-post'
+]);
 Route::get('/remove-post/{slug}',[
     'uses' => 'backend\PostController@destroy',
     'as'   => 'remove-post'
+]);
+Route::post('/posts/remove-items',[
+    'uses' => 'backend\PostController@removeItems',
+    'as'   => 'remove-items'
+]);
+Route::post('/posts/change-status',[
+    'uses' => 'backend\PostController@changeStatus',
+    'as'   => 'change-status'
 ]);
 Route::get('/{anypath}',[
     'uses'    => 'HomeController@index',
     'as'      => 'path','.*'
 ]);
 // post
-Route::get('/{anypath}',[
-    'uses'    => 'HomeController@index',
-    'as'      => 'path','.*'
-]);
-// Route::get('/categoryList',[
-//     'uses' => 'backend\CategoryController@show',
-//     'as'   => 'categoryList'
-// ]);
 
-// Route::get('/post', 'backend\PostController@index');
-// Route::get('/category', 'backend\CategoryController@index');
