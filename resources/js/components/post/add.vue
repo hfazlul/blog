@@ -41,7 +41,6 @@
                                      <div class="form-group">
                                         <label >Post Description</label>
                                         <textarea type="text" rows="5" class="form-control" :class="{ 'is-invalid': form.errors.has('description') }" name="description" placeholder="Post description" v-model="form.description"></textarea>
-                                        <has-error :form="form" field="description"></has-error>
                                     </div>
 
                                     <div class="form-group">
