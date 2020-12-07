@@ -18,4 +18,5 @@ class Post extends Model
     public function user(){
         return $this->belongsTo(User::class)->select('id','name');
     }
+               $post ->category_id  =$request->category_id;
 }
