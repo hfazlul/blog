@@ -27,7 +27,7 @@
                             <div class="card-body">
                                     <div class="form-group">
                                         <label for="category_id">Category Select</label>
-                                        <select id="category_id" class="form-control" :class="{ 'is-invalid': form.errors.has('category_id') }"  v-model="form.category_id">
+                                        <select id="category_id" name="category_id" class="form-control" :class="{ 'is-invalid': form.errors.has('category_id') }"  v-model="form.category_id">
                                             <option value="" >Select any one</option>
                                             <option :value="cat.id" v-for="cat in categories">{{cat.name}}</option>
                                         </select>
@@ -40,14 +40,22 @@
                                     </div>
                                      <div class="form-group">
                                         <label >Post Description</label>
-                                        <textarea type="text" rows="5" class="form-control" :class="{ 'is-invalid': form.errors.has('description') }" name="description" placeholder="Post description" v-model="form.description"></textarea>
+                                        <ckeditor rows="5" name="content" :editor="editor" :class="{ 'is-invalid': form.errors.has('content') }" v-model="form.content" :config="editorConfig"></ckeditor>
+                                        <has-error :form="form" field="content"></has-error>
+                                    </div>
+                                     <div class="form-group">
+                                        <label >Select Image</label>
+                                       <input type="file" name="thumbnail" id="thumbnail" @change="LoadThumbnail($event)">
+                                       <br/>
+                                       <img style="height:100px; width:100px; margin-left:87px; border:none;" :src="form.thumbnail" alt="">
+                                        <has-error :form="form" field="thumbnail"></has-error>
                                     </div>
 
                                     <div class="form-group">
                                         <label >Publication Status</label>
                                         <div class="form-group">
-                                            <label><input type="radio" class="" name="status" value="1" v-model="form.status"/>Published</label>
-                                            <label><input type="radio" class="" name="status" value="0" v-model="form.status"/>UnPublished</label>
+                                            <label><input type="radio" class="" name="status" value="published" v-model="form.status"/>Published</label>
+                                            <label><input type="radio" class="" name="status" value="draft" v-model="form.status"/>UnPublished</label>
 
                                         </div>
                                         <span :class="{ 'is-invalid': form.errors.has('status') }" ></span>
@@ -70,15 +78,24 @@
 </template>
 
 <script>
+   import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
     export default {
          name: "PostAdd",
          data: function (){
              return {
                  form: new Form({
-                    name:'',
-                    status: '',
+                    title:'',
+                    status:'',
+                    content: '',
+                    thumbnail: null,
                     category_id: ''
-                 })
+                 }),
+                 editor: ClassicEditor,
+                 editorData: '<p>Content of the editor.</p>',
+                 editorConfig: {
+
+                    // The configuration of the editor.
+                 }
 
              }
 
@@ -94,19 +111,27 @@
 
          methods: {
              addPost: function () {
-                 let test =this;
                  this.form.post('/addPost')
-                 .then(function (data) {
-                    // Toast.fire({
-                    // icon: 'success',
-                    // title: 'Category add successfully'
-                    // })
-                    toastr.success('Post add successfully',{timeOut:5000});
-                     test.form.name=null;
-                     test.form.status=null;
+                 .then((response)=> {
+                    toastr.success('Post add successfully');
+                     this.form.title=null;
+                     this.form.status=null;
+                     this.form.category_id='';
+                     this.form.content=null;
+                     this.form.thumbnail=null;
+                 }).catch((error)=>{
+
                  })
 
-             }
+             },
+             LoadThumbnail: function(e){
+                 let file = e.target.files[0];
+                 let reader = new FileReader();
+                 reader.onload = e => {
+                     this.form.thumbnail =e.target.result;
+                 }
+                 reader.readAsDataURL(file);
+             },
          },
 
     }
