@@ -5,6 +5,8 @@ namespace App\Http\Controllers\backend;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Model\Post;
+use Image;
+use App\Model\Category;
 
 class PostController extends Controller
 {
@@ -15,7 +17,7 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts=Post::with('category', 'user')->get();
+        $posts=Post::with('category', 'user')->orderBy('id','DESC')->get();
         return response()->json(['posts' => $posts], 200);
     }
 
@@ -37,12 +39,16 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-                            'name' => 'required|min:5|max:20',
-                            'status' => 'required',
-                         ]);
+        $success=false;
+        $request->validate
 
-        Post::savePostInfo($request);
+        ([
+             'title' => 'required|min:5|max:20',
+             'status' => 'required',
+         ]);
+
+        $success=Post::savePostInfo($request);
+        return response()->json(['success'=>$success], 200);
     }
 
     /**
@@ -53,8 +59,12 @@ class PostController extends Controller
      */
     public function show($slug)
     {
-        $post=Post::where('slug',$slug)->first();
+
+        $post = Post::where('slug',$slug)->first();
+        // return $post;
+        // print_r($post);
        return response()->json(['post'=>$post], 200);
+
     }
 
     /**
@@ -91,13 +101,13 @@ class PostController extends Controller
      */
     public function update(Request $request)
     {
+        $success= false;
         $request->validate([
-            'name' => 'required|min:5|max:20',
+            'title' => 'required|min:5|max:20',
             'status' => 'required',
         ]);
-
-        Post::updatePostInfo($request);
-
+        $success=Post::updatePostInfo($request);
+        return response()->json(['success'=>$success], 200);
     }
 
     /**
@@ -109,7 +119,11 @@ class PostController extends Controller
     public function destroy($slug)
     {
        $post=Post::where('slug',$slug)->first();
+       $fileName= $post->thumbnail;
        if( $post->delete()){
+           if(file_exists(public_path('assets/images/'.$fileName))){
+            unlink(public_path('assets/images/'.$fileName));
+           }
            $success=true;
        }
        else{
@@ -121,10 +135,14 @@ class PostController extends Controller
     public function removeItems(Request $request){
         $sl=0;
       foreach($request->ids as $id){
-          $category=Post::find($id);
-          $category->delete();
-          $sl++;
-
+          $post=Post::find($id);
+          $fileName= $post->thumbnail;
+          if( $post->delete()){
+            if(file_exists(public_path('assets/images/'.$fileName))){
+             unlink(public_path('assets/images/'.$fileName));
+            }
+            $sl++;
+         }
       }
       $success= $sl > 0 ? true : false;
       return response()->json(['success'=> $success, 'total'=>$sl], 200);
@@ -133,9 +151,9 @@ class PostController extends Controller
     public function changeStatus(Request $request){
         $sl=0;
         foreach($request->ids as $id){
-           $category=Post::find($id);
-           $category->status =$request->status;
-           $category->save();
+           $post=Post::find($id);
+           $post->status =$request->status;
+           $post->save();
            $sl++;
 
           }

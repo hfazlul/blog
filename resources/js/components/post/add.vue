@@ -47,7 +47,8 @@
                                         <label >Select Image</label>
                                        <input type="file" name="thumbnail" id="thumbnail" @change="LoadThumbnail($event)">
                                        <br/>
-                                       <img style="height:100px; width:100px; margin-left:87px; border:none;" :src="form.thumbnail" alt="">
+                                       <img style="height:70px; width:90px; margin-left:87px; border-radius: 5px 5px 5px 5px;
+                                       background: rgba(76, 175, 80, 0.1); opacity:0.7;" :src="form.thumbnail">
                                         <has-error :form="form" field="thumbnail"></has-error>
                                     </div>
 
@@ -87,7 +88,7 @@
                     title:'',
                     status:'',
                     content: '',
-                    thumbnail: null,
+                    thumbnail: '',
                     category_id: ''
                  }),
                  editor: ClassicEditor,
@@ -117,23 +118,15 @@
                      this.form.title=null;
                      this.form.status=null;
                      this.form.category_id='';
-                     this.form.content=null;
+                     this.form.content='';
                      this.form.thumbnail=null;
                  }).catch((error)=>{
 
                  })
 
              },
-             LoadThumbnail: function(e){
-                 let file = e.target.files[0];
-                 let reader = new FileReader();
-                 reader.onload = e => {
-                     this.form.thumbnail =e.target.result;
-                 }
-                 reader.readAsDataURL(file);
-             },
-         },
 
+         }
     }
 </script>
 

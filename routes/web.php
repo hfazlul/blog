@@ -36,10 +36,7 @@ Route::get('/getCategories',[
     'uses' => 'backend\CategoryController@index',
     'as'   => 'getCategories'
 ]);
-Route::get('/getActiveCategories',[
-    'uses' => 'backend\CategoryController@getActiveCategories',
-    'as'   => 'getActiveCategories'
-]);
+
 Route::get('/show-category/{slug}',[
     'uses' => 'backend\CategoryController@show',
     'as'   => 'show-category'
@@ -69,6 +66,11 @@ Route::post('/categories/change-status',[
 
 
 // post
+Route::get('/getActiveCategories',[
+    'uses' => 'backend\CategoryController@getActiveCategories',
+    'as'   => 'getActiveCategories'
+]);
+
 Route::post('/addPost',[
     'uses' => 'backend\PostController@store',
     'as'   => 'addPost'
@@ -77,9 +79,13 @@ Route::get('/getPosts',[
     'uses' => 'backend\PostController@index',
     'as'   => 'getPosts'
 ]);
-Route::get('/show-post/{slug}',[
+Route::get('/remove-post/{slug}',[
+    'uses' => 'backend\PostController@destroy',
+    'as'   => 'remove-post'
+]);
+Route::get('/postEdit/{slug}',[
     'uses' => 'backend\PostController@show',
-    'as'   => 'show-post'
+    'as'   => 'postEdit'
 ]);
 Route::post('/updatePost',[
     'uses' => 'backend\PostController@update',
@@ -89,10 +95,7 @@ Route::get('/status-post/{id}',[
     'uses' => 'backend\PostController@status',
     'as'   => 'status-post'
 ]);
-Route::get('/remove-post/{slug}',[
-    'uses' => 'backend\PostController@destroy',
-    'as'   => 'remove-post'
-]);
+
 Route::post('/posts/remove-items',[
     'uses' => 'backend\PostController@removeItems',
     'as'   => 'remove-items'

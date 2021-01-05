@@ -40,7 +40,7 @@
         component: postAdd
       },
       {
-        path: '/edit-post/:slug',
+        path: '/postEdit/:slug',
         component: postEdit
       },
       //  for Post

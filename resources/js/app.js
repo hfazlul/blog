@@ -1,6 +1,7 @@
 
 require('./bootstrap');
 window.Vue = require('vue');
+const axios = require('axios').default;
 
 // vuex----start
 import Vuex from 'vuex';
@@ -10,6 +11,12 @@ const store = new Vuex.Store(
         storeData
   );
 // vuex----end
+
+
+// ckeditor-5----end
+import CKEditor from '@ckeditor/ckeditor5-vue2';
+Vue.use( CKEditor );
+// ckeditor-5----end
 
 // vue-Router----start
 import VueRouter from 'vue-router';
@@ -70,6 +77,7 @@ Vue.component('example', require('./components/routeControl.vue').default);
 const app = new Vue({
     el: '#app',
     router,
-    store
+    store,
+
 });
 // vue-Instance----End

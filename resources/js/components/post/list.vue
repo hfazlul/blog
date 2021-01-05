@@ -17,10 +17,10 @@
                 </div>
                 <!-- /.card-header -->
                 <div class="card-body">
+                     <h6>Check All</h6>
                     <div class="table-responsive">
                          <table id="example2" class="table table-bordered table-hover">
                         <thead >
-                            <h6>Check All</h6>
                             <tr class="text-center">
                              <th>
                                  <input type="checkbox" :disabled="emptyData()" @click="selectAll" v-model="selectIds">
@@ -29,6 +29,7 @@
                             <th>User Name</th>
                             <th>Category Name</th>
                             <th>Title</th>
+                            <th>Content</th>
                             <th>Thumbnail</th>
                             <th>Status</th>
                             <th>Time</th>
@@ -42,10 +43,13 @@
                                 <input type="checkbox" :value="post.id" v-model="selectId">
                             </td>
                             <td>{{++index}}</td>
-                            <td>{{post.user.name|subString(10)}}</td>
-                            <td>{{post.category.name|subString(10)}}....</td>
-                            <td>{{post.title|subString(15)}}....</td>
-                            <td><img width="60" :src="post.thumbnail" alt=""></td>
+                            <td>{{post.user.name|subString(7)}}</td>
+                            <td>{{post.category.name|subString(7)}}....</td>
+                            <td>{{post.title|subString(10)}}....</td>
+                            <td>{{post.content|subString(10)}}....</td>
+                            <td>
+                                <!-- <input type="hidden" value="{{post.thumbnail}}"/> -->
+                                <img width="60" style=" border:2px solid green; border-radius: 5px 5px 5px 5px;" :src="fileLink(post.thumbnail)" alt=""></td>
                             <td>{{statusName(post.status)}}</td>
                             <td>{{post.created_at|time}}</td>
                             <td style="height:50px;">
@@ -53,7 +57,7 @@
                                     <a href="" :class="statusColor(post.status)" class="btn btn-xs" @click.prevent="status(post.id)">
                                     <span :class="statusArrow(post.status)"></span>
                                     </a>
-                                  <router-link :to = "`/edit-post/${post.slug}`" class="edit-btn btn btn-success btn-xs">
+                                  <router-link :to = "`/postEdit/${post.slug}`" class="edit-btn btn btn-success btn-xs">
                                     <span class="fa fa-edit "></span>
                                   </router-link>
 
@@ -109,6 +113,7 @@ export default {
 
     mounted() {
             this.$store.dispatch("getPosts");
+            this.$store.dispatch("getActiveCategories");
     },
 
      watch:{
@@ -200,8 +205,6 @@ export default {
 
            })
         },
-
-
 
     }
 
